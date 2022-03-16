@@ -74,7 +74,7 @@ public class TeamCommand extends BaseCommand {
         }
 
         //Checks if the name is valid
-        if (name.length() < 2) {
+        if (name.length() < 3) {
             sender.sendMessage(ChatColor.RED + "The name " + name + " is to short!");
             return;
         }
@@ -565,7 +565,7 @@ public class TeamCommand extends BaseCommand {
         ChatManager.setPlayerChat(sender.getUniqueId(), chat);
 
         //Sends message
-        sender.sendMessage(ChatColor.GREEN + "You are now on the " + chat.getName() + ChatColor.GREEN + " chat");
+        sender.sendMessage(ChatColor.GREEN + "You are now in " + chat.getName() + ChatColor.GREEN + " chat.");
 
     }
 
@@ -590,7 +590,7 @@ public class TeamCommand extends BaseCommand {
             return;
         }
 
-        if (!TeamManager.isInTeam(target.getUniqueId()) && target != null) {
+        if (target != null && !TeamManager.isInTeam(target.getUniqueId())) {
             sender.sendMessage(ChatColor.RED + target.getName() + " doesn't have a team!");
             return;
         }
@@ -717,7 +717,7 @@ public class TeamCommand extends BaseCommand {
         Team team = TeamManager.getTeam(sender.getUniqueId()).get();
 
         //Sends message
-        team.sendMessage(ChatColor.RED + "Your team has been disbanded");
+        team.sendMessage(ChatColor.RED + "Your team has been disbanded!");
 
         //Deletes team
         TeamManager.deleteTeam(team.getName());
@@ -746,7 +746,7 @@ public class TeamCommand extends BaseCommand {
         Team target = TeamManager.getTeam(commandTarget).get();
 
         //Sends message
-        target.sendMessage(ChatColor.RED + "Your team has been disbanded");
+        target.sendMessage(ChatColor.RED + "Your team has been disbanded!");
         sender.sendMessage(ChatColor.GREEN + "You have disbanded the " + commandTarget + "team.");
 
         //Deletes team

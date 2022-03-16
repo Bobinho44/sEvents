@@ -1,38 +1,32 @@
-package fr.bobinho.steams;
+package fr.bobinho.sevents;
 
 import co.aikar.commands.PaperCommandManager;
+import fr.bobinho.sevents.utils.settings.BSettings;
 import fr.bobinho.steams.commands.team.TeamCommand;
 import fr.bobinho.steams.commands.team.TeamsCommand;
 import fr.bobinho.steams.listeners.ChatListener;
 import fr.bobinho.steams.listeners.TeamListener;
-import fr.bobinho.steams.utils.settings.BSettings;
-import fr.bobinho.steams.utils.team.TeamManager;
-import net.luckperms.api.LuckPermsProvider;
-import net.luckperms.api.platform.PlayerAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import javax.annotation.Nonnull;
 
-public class sTeamsCore extends JavaPlugin {
+public class sEventsCore extends JavaPlugin {
 
     /**
      * Fields
      */
-    private static sTeamsCore instance;
+    private static sEventsCore instance;
     private static BSettings teamsSettings;
-    private static PlayerAdapter<Player> luckperm;
 
     /**
-     * Gets the sutils core instance
+     * Gets the sevents core instance
      *
-     * @return the sutils core instance
+     * @return the sevents core instance
      */
     @Nonnull
-    public static sTeamsCore getInstance() {
+    public static sEventsCore getInstance() {
         return instance;
     }
 
@@ -46,12 +40,10 @@ public class sTeamsCore extends JavaPlugin {
         return teamsSettings;
     }
 
-    public static PlayerAdapter<Player>  getLuckPerm() {
-        return luckperm;
-    }
     /**
      * Enable and initialize the plugin
      */
+    @Override
     public void onEnable() {
         instance = this;
 
@@ -60,11 +52,6 @@ public class sTeamsCore extends JavaPlugin {
         //Registers commands and listeners
         registerCommands();
         registerListeners();
-
-        //Registers files settings
-        teamsSettings = new BSettings("teams");
-        luckperm = LuckPermsProvider.get().getPlayerAdapter(Player.class);
-        TeamManager.loadTeams();
     }
 
     /**
@@ -72,8 +59,6 @@ public class sTeamsCore extends JavaPlugin {
      */
     public void onDisable() {
         Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[sTeams] Unloading the plugin...");
-
-        TeamManager.saveTeams();
     }
 
     /**

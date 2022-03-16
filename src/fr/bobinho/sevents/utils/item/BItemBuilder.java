@@ -1,4 +1,4 @@
-package fr.bobinho.steams.utils.item;
+package fr.bobinho.sevents.utils.item;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Color;
@@ -21,7 +21,7 @@ public class BItemBuilder {
      * Fields
      */
     private ItemStack item;
-    private ItemMeta meta;
+    private final ItemMeta meta;
 
     /**
      * Creates the practice item builder
@@ -158,13 +158,13 @@ public class BItemBuilder {
         Validate.notNull(lore, "lore is null");
 
         //Declares the lore
-        List<String> lore_array = new ArrayList<>();
+        List<String> lores = new ArrayList<>();
         for (@Nonnull String text : lore) {
-            lore_array.add(text);
+            lores.add(text);
         }
 
         //Sets the item lore
-        meta.setLore(lore_array);
+        meta.setLore(lores);
         item.setItemMeta(meta);
         return this;
     }
@@ -180,20 +180,18 @@ public class BItemBuilder {
         Validate.notNull(lore, "lore is null");
 
         //Declare the lore array.
-        List<String> lore_array = meta.getLore();
+        List<String> lores = meta.getLore();
 
         //If the lore is null or empty, create empty list.
-        if (lore_array == null) {
-            lore_array = new ArrayList<>();
+        if (lores == null) {
+            lores = new ArrayList<>();
         }
 
         //Adds new lines to the existed lore
-        for (String text : lore) {
-            lore_array.add(text);
-        }
+        lores.addAll(lore);
 
         //Sets the item lore
-        meta.setLore(lore_array);
+        meta.setLore(lores);
         item.setItemMeta(meta);
         return this;
     }

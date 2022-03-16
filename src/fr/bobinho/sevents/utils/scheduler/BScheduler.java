@@ -1,6 +1,6 @@
-package fr.bobinho.steams.utils.scheduler;
+package fr.bobinho.sevents.utils.scheduler;
 
-import fr.bobinho.steams.sTeamsCore;
+import fr.bobinho.sevents.sEventsCore;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
@@ -14,7 +14,7 @@ public class BScheduler {
     /**
      * Plugin instance
      */
-    private static final sTeamsCore PLUGIN = sTeamsCore.getInstance();
+    private static final sEventsCore PLUGIN = sEventsCore.getInstance();
 
     /**
      * Scheduler types

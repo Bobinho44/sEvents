@@ -1,6 +1,6 @@
-package fr.bobinho.steams.utils.settings;
+package fr.bobinho.sevents.utils.settings;
 
-import fr.bobinho.steams.sTeamsCore;
+import fr.bobinho.sevents.sEventsCore;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -17,7 +17,7 @@ public class BSettings {
     /**
      * Plugin instance
      */
-    private static final sTeamsCore PLUGIN = sTeamsCore.getInstance();
+    private static final sEventsCore PLUGIN = sEventsCore.getInstance();
 
     /**
      * Fields
@@ -29,7 +29,7 @@ public class BSettings {
         Validate.notNull(fileName, "fileName is null");
 
         this.fileName = fileName;
-        Initialize();
+        initialize();
     }
 
     /**
@@ -44,7 +44,7 @@ public class BSettings {
     /**
      * Initializes settings file
      */
-    public void Initialize() {
+    public void initialize() {
         File file = new File(PLUGIN.getDataFolder() + "/" + getFileName() + ".yml");
 
         if (!file.exists()) {

@@ -1,4 +1,4 @@
-package fr.bobinho.steams.utils.location;
+package fr.bobinho.sevents.utils.location;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -7,6 +7,8 @@ import org.bukkit.Location;
 import javax.annotation.Nonnull;
 
 public class BLocationUtil {
+
+    private BLocationUtil() {}
 
     /**
      * Serializes a location
@@ -73,7 +75,7 @@ public class BLocationUtil {
         Validate.notNull(location2, "location2 is null");
         Validate.notNull(tested, "tested is null");
 
-        return isBetweenTwo1DPoint(location1.getX(), location2.getX(), tested.getX()) && isBetweenTwo1DPoint(location1.getZ(), location2.getZ(), tested.getZ());
+        return location1.getWorld().equals(tested.getWorld()) && isBetweenTwo1DPoint(location1.getX(), location2.getX(), tested.getX()) && isBetweenTwo1DPoint(location1.getZ(), location2.getZ(), tested.getZ());
     }
 
 }
