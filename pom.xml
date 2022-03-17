@@ -47,6 +47,7 @@
                 <directory>src/resources</directory>
                 <includes>
                     <include>plugin.yml</include>
+                    <include>events.yml</include>
                 </includes>
             </resource>
         </resources>

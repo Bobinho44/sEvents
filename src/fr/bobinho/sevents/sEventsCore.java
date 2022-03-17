@@ -1,11 +1,10 @@
 package fr.bobinho.sevents;
 
 import co.aikar.commands.PaperCommandManager;
+import fr.bobinho.sevents.commands.event.koth.KOTHCommand;
+import fr.bobinho.sevents.listeners.KOTHListener;
+import fr.bobinho.sevents.utils.event.EventManager;
 import fr.bobinho.sevents.utils.settings.BSettings;
-import fr.bobinho.steams.commands.team.TeamCommand;
-import fr.bobinho.steams.commands.team.TeamsCommand;
-import fr.bobinho.steams.listeners.ChatListener;
-import fr.bobinho.steams.listeners.TeamListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,7 +17,7 @@ public class sEventsCore extends JavaPlugin {
      * Fields
      */
     private static sEventsCore instance;
-    private static BSettings teamsSettings;
+    private static BSettings eventsSetting;
 
     /**
      * Gets the sevents core instance
@@ -31,13 +30,13 @@ public class sEventsCore extends JavaPlugin {
     }
 
     /**
-     * Gets the teams settings
+     * Gets the events settings
      *
-     * @return the teams settings
+     * @return the events settings
      */
     @Nonnull
-    public static BSettings getTeamsSettings() {
-        return teamsSettings;
+    public static BSettings getEventsSetting() {
+        return eventsSetting;
     }
 
     /**
@@ -52,6 +51,10 @@ public class sEventsCore extends JavaPlugin {
         //Registers commands and listeners
         registerCommands();
         registerListeners();
+
+        eventsSetting = new BSettings("events");
+
+        EventManager.loadEvents();
     }
 
     /**
@@ -59,6 +62,8 @@ public class sEventsCore extends JavaPlugin {
      */
     public void onDisable() {
         Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[sTeams] Unloading the plugin...");
+
+        EventManager.saveEvents();
     }
 
     /**
@@ -67,10 +72,11 @@ public class sEventsCore extends JavaPlugin {
     private void registerListeners() {
 
         //Registers test listener
-        Bukkit.getServer().getPluginManager().registerEvents(new TeamListener(), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new ChatListener(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new KOTHListener(), this);
 
         Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "Successfully loaded listeners");
+
+        EventManager.saveEvents();
     }
 
     /**
@@ -79,9 +85,8 @@ public class sEventsCore extends JavaPlugin {
     private void registerCommands() {
         final PaperCommandManager commandManager = new PaperCommandManager(this);
 
-        //Registers teams command
-        commandManager.registerCommand(new TeamCommand());
-        commandManager.registerCommand(new TeamsCommand());
+        //Registers KOTH command
+        commandManager.registerCommand(new KOTHCommand());
 
         Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "Successfully loaded commands");
     }

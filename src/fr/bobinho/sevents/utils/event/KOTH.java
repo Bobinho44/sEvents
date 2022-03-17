@@ -21,7 +21,7 @@ public class KOTH extends Event {
     private static final int MINIMUM_LOOTED_ITEM_NUMBER = 3;
     private static final int MAXIMUM_BONUS_LOOTED_ITEM_NUMBER = 2;
     private static final int COOLDOWN = 600;
-    private static final int LOOT_TABLE_SIZE = 45;
+    public static final int LOOT_TABLE_SIZE = 45;
     private static final Random RANDOM = new Random();
 
     private final Location corner;
@@ -31,6 +31,13 @@ public class KOTH extends Event {
     private final ItemStack[] lootTable = new ItemStack[LOOT_TABLE_SIZE];
     private int captureCooldown;
     private JGlobalMethodBasedScoreboard scoreboard;
+
+    public KOTH(@Nonnull String name, @Nonnull Location corner, @Nonnull Location oppositeCorner, @Nonnull ItemStack[] lootTable) {
+        this(name, corner, oppositeCorner);
+
+        Validate.notNull(lootTable, "lootTable is null");
+        setLootTable(lootTable);
+    }
 
     public KOTH(@Nonnull String name, @Nonnull Location corner, @Nonnull Location oppositeCorner) {
         super(name);
@@ -139,10 +146,16 @@ public class KOTH extends Event {
                 .filter(getter -> Bukkit.getPlayer(getter.getKey()) != null)
                 .max(Map.Entry.comparingByValue()).ifPresent(winner -> {
                     int itemNumber = RANDOM.nextInt(MINIMUM_LOOTED_ITEM_NUMBER) + MAXIMUM_BONUS_LOOTED_ITEM_NUMBER;
+                    Player KOTHPlayerWinner = Objects.requireNonNull(Bukkit.getPlayer(winner.getKey()));
                     for (int i = 0; i < itemNumber && getShuffleledLootTable().size() > i; i++) {
-                        Objects.requireNonNull(Bukkit.getPlayer(winner.getKey())).getInventory().addItem(getShuffleledLootTable().get(i));
+                        KOTHPlayerWinner.getInventory().addItem(getShuffleledLootTable().get(i));
                     }
+
+                    Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(ChatColor.GREEN + KOTHPlayerWinner.getName() + "won the KOTH!"));
+                    return;
                 });
+
+        Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(ChatColor.RED + "No one has won the KOTH!"));
     }
 
     @Override
@@ -152,6 +165,7 @@ public class KOTH extends Event {
         BScheduler.asyncScheduler().every(1, TimeUnit.SECONDS).run(() -> {
 
             if (getCaptureCooldown() >= COOLDOWN) {
+                stop();
                 return;
             }
 
