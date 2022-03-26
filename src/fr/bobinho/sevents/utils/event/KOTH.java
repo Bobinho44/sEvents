@@ -7,6 +7,7 @@ import fr.bobinho.sevents.utils.scheduler.BScheduler;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -71,9 +72,7 @@ public class KOTH extends Event {
         return actualGetter;
     }
 
-    public void setActualGetter(@Nonnull UUID actualGetter) {
-        Validate.notNull(actualGetter, "actualGetter is null");
-
+    public void setActualGetter(UUID actualGetter) {
         this.actualGetter = actualGetter;
     }
 
@@ -84,11 +83,18 @@ public class KOTH extends Event {
     }
 
     public void searchTheNewActualGetter() {
-        List<Player> actualGetters = Bukkit.getOnlinePlayers().stream().filter(this::isInCaptureZone).collect(Collectors.toList());
+        List<Player> actualGetters = Bukkit.getOnlinePlayers().stream()
+                .filter(player -> isInCaptureZone(player) && player.getGameMode() == GameMode.SURVIVAL).collect(Collectors.toList());
 
-        if (actualGetters.size() == 1 && !getActualGetter().equals(actualGetters.get(0).getUniqueId())) {
-            setActualGetter(actualGetters.get(0).getUniqueId());
+        if (getActualGetter() != null && actualGetters.stream().noneMatch(getter -> getter.getUniqueId().equals(getActualGetter()))) {
+            Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(ChatColor.RED + Bukkit.getOfflinePlayer(getActualGetter()).getName() + " has lost control of the area!"));
             resetCaptureCooldown();
+            setActualGetter(null);
+        }
+
+        if (actualGetters.size() == 1 && getActualGetter() == null) {
+            Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(ChatColor.GREEN + actualGetters.get(0).getName() + " has taken control of the area!"));
+            setActualGetter(actualGetters.get(0).getUniqueId());
         }
     }
 
@@ -97,7 +103,7 @@ public class KOTH extends Event {
     }
 
     public List<ItemStack> getShuffleledLootTable() {
-        List<ItemStack> shuffleledLootTable = Arrays.asList(getLootTable());
+        List<ItemStack> shuffleledLootTable = Arrays.stream(getLootTable()).filter(Objects::nonNull).collect(Collectors.toList());
         Collections.shuffle(shuffleledLootTable);
         return shuffleledLootTable;
     }
@@ -123,25 +129,35 @@ public class KOTH extends Event {
     }
 
     public void resetCaptureCooldown() {
+        getGettersTime().clear();
         captureCooldown = 0;
     }
 
     public void showScoreBoard() {
         scoreboard.setTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "Event");
         scoreboard.setLines(
-                ChatColor.AQUA + "" + ChatColor.BOLD + "KOTH:",
+                " ",
+                ChatColor.AQUA + "" + ChatColor.BOLD + " KOTH:",
                 ChatColor.WHITE + getName() + ": " + ChatColor.RED + getTimer(),
                 ChatColor.WHITE + "(" + ((int) getCorner().getX() + getOppositeCorner().getX()) / 2 + " , " + ((int) getCorner().getZ() + getOppositeCorner().getZ()) / 2 + ")",
                 " ",
                 ChatColor.GREEN + "luxepvp.net"
+
         );
+        Bukkit.getOnlinePlayers().forEach(player -> scoreboard.addPlayer(player));
     }
 
     public void hideScoreBoard() {
+        Bukkit.getOnlinePlayers().forEach(player -> scoreboard.removePlayer(player));
         scoreboard.destroy();
     }
 
     public void giveKOTHItems() {
+        if (getCaptureCooldown() < COOLDOWN) {
+            Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(MessageKOTH.NO_WINNER_KOTH.getMessage(getName())));
+            return;
+        }
+
         getGettersTime().entrySet().stream()
                 .filter(getter -> Bukkit.getPlayer(getter.getKey()) != null)
                 .max(Map.Entry.comparingByValue()).ifPresent(winner -> {
@@ -151,21 +167,25 @@ public class KOTH extends Event {
                         KOTHPlayerWinner.getInventory().addItem(getShuffleledLootTable().get(i));
                     }
 
-                    Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(ChatColor.GREEN + KOTHPlayerWinner.getName() + "won the KOTH!"));
-                    return;
+                    Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(MessageKOTH.WINNER_KOTH.getMessage(KOTHPlayerWinner.getName(), getName())));
                 });
 
-        Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(ChatColor.RED + "No one has won the KOTH!"));
     }
 
     @Override
     public void start() {
         scoreboard = new JGlobalMethodBasedScoreboard();
+        Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(MessageKOTH.START_KOTH.getMessage(getName())));
 
-        BScheduler.asyncScheduler().every(1, TimeUnit.SECONDS).run(() -> {
+        BScheduler.syncScheduler().every(1, TimeUnit.SECONDS).run(task -> {
+
+            if (getCaptureCooldown() >= COOLDOWN*1000) {
+                return;
+            }
 
             if (getCaptureCooldown() >= COOLDOWN) {
-                stop();
+                EventManager.stopAnEvent(this);
+                task.cancel();
                 return;
             }
 
@@ -178,7 +198,10 @@ public class KOTH extends Event {
 
     @Override
     public void stop() {
+        EventManager.deleteAnEvent(this);
+        EventManager.createAnEvent(new KOTH(getName(), getCorner(), getOppositeCorner(), getLootTable()));
         giveKOTHItems();
+        captureCooldown = COOLDOWN*1000;
         hideScoreBoard();
     }
 

@@ -9,7 +9,7 @@ public class BDurationFormat {
      * @return the formatted string in minutes - seconds format
      */
     public static String getAsMinuteSecondFormat(long durationInSecond) {
-        return ((int) durationInSecond / 60) + ":" +  ((int) durationInSecond % 60);
+        return ((int) durationInSecond / 60) + ":" + (durationInSecond % 60 < 10 ? "0" : "") + (durationInSecond % 60);
     }
 
     /**

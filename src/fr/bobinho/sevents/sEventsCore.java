@@ -17,6 +17,7 @@ public class sEventsCore extends JavaPlugin {
      * Fields
      */
     private static sEventsCore instance;
+    private static BSettings messagesSetting;
     private static BSettings eventsSetting;
 
     /**
@@ -27,6 +28,16 @@ public class sEventsCore extends JavaPlugin {
     @Nonnull
     public static sEventsCore getInstance() {
         return instance;
+    }
+
+    /**
+     * Gets the messages settings
+     *
+     * @return the messages settings
+     */
+    @Nonnull
+    public static BSettings getMessagesSetting() {
+        return messagesSetting;
     }
 
     /**
@@ -46,12 +57,13 @@ public class sEventsCore extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
-        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[sTeams] Loading the plugin...");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[sEvents] Loading the plugin...");
 
         //Registers commands and listeners
         registerCommands();
         registerListeners();
 
+        messagesSetting = new BSettings("messages");
         eventsSetting = new BSettings("events");
 
         EventManager.loadEvents();
@@ -61,7 +73,7 @@ public class sEventsCore extends JavaPlugin {
      * Disable the plugin and save data
      */
     public void onDisable() {
-        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[sTeams] Unloading the plugin...");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[sEvents] Unloading the plugin...");
 
         EventManager.saveEvents();
     }
@@ -75,8 +87,6 @@ public class sEventsCore extends JavaPlugin {
         Bukkit.getServer().getPluginManager().registerEvents(new KOTHListener(), this);
 
         Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "Successfully loaded listeners");
-
-        EventManager.saveEvents();
     }
 
     /**

@@ -16,7 +16,7 @@ public class LootTableInventory {
         Inventory inventory = Bukkit.createInventory(new LootTableHolder(koth, readOnly), KOTH.LOOT_TABLE_SIZE, Component.text(koth.getName() + "'s loot table"));
 
         //Places initial items
-        for (int i = 0; i < 54; i++) {
+        for (int i = 0; i < KOTH.LOOT_TABLE_SIZE; i++) {
             inventory.setItem(i, koth.getLootTable()[i]);
         }
 

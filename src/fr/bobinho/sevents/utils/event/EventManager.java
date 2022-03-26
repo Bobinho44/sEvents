@@ -3,6 +3,7 @@ package fr.bobinho.sevents.utils.event;
 import fr.bobinho.sevents.sEventsCore;
 import fr.bobinho.sevents.utils.location.BLocationUtil;
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -104,13 +105,15 @@ public class EventManager {
 
         //Saves events
         for (Event event : getEvents()) {
-            switch (event.getClass().getName()) {
+            switch (event.getClass().getSimpleName()) {
                 case "KOTH":
                     configuration.set("KOTH." + event.getName() + ".corner", BLocationUtil.getAsString(((KOTH) event).getCorner()));
                     configuration.set("KOTH." + event.getName() + ".oppositeCorner", BLocationUtil.getAsString(((KOTH) event).getOppositeCorner()));
                     for (int i = 0; i < KOTH.LOOT_TABLE_SIZE; i++) {
                         configuration.set("KOTH." + event.getName() + ".lootTable." + i, ((KOTH) event).getLootTable()[i]);
                     }
+                    break;
+                default:
                     break;
             }
         }
