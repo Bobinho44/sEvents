@@ -3,13 +3,16 @@ package fr.bobinho.sevents.utils.event;
 import fr.bobinho.sevents.sEventsCore;
 import fr.bobinho.sevents.utils.location.BLocationUtil;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class EventManager {
 
@@ -44,6 +47,12 @@ public class EventManager {
         Validate.isTrue(isItAnEvent(event.getName()), "name is not used by an event");
 
         getEvents().remove(event);
+    }
+
+    public static boolean isInKOTHZone(@Nonnull Player player) {
+        Validate.notNull(player, "player is null");
+
+        return getEvents().stream().anyMatch(event -> event instanceof KOTH && ((KOTH) event).isInCaptureZone(player));
     }
 
     public static Event getActualEvent() {
@@ -82,7 +91,7 @@ public class EventManager {
                     if (configuration.getConfigurationSection("KOTH.").getKeys(false) == null) {
                         break;
                     }
-                    
+
                     for (String eventName : Objects.requireNonNull(configuration.getConfigurationSection("KOTH.")).getKeys(false)) {
 
                         Location corner = BLocationUtil.getAsLocation(configuration.getString("KOTH." + eventName + ".corner", "world:0:0:0:0:0"));
